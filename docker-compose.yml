@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:12-bullseye
+    container_name: postgres   
+    restart: always
+    ports:
+      - "5434:5432"
+    env_file:
+      - .env  
+    environment:
+      - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=3g8tss955
+      - POSTGRES_DB=base_flask
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - flask_base
+  flask_python:
+    container_name: flask_python
+    build: .
+    depends_on:
+      - postgres
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    command: python src/app.py 0.0.0.0:85
+    ports:
+      - "8005:85"
+    volumes:
+      - .:/appbizion
+    environment:
+      FLASK_DEBUG: development
+    networks:
+      - flask_base
+networks:
+  flask_base:
+    name: flask_base
+    driver: bridge
+volumes:
+  pgdata:
+  
